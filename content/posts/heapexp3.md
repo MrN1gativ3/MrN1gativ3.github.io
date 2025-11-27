@@ -14,7 +14,7 @@ In this post we will take look at a simple heap overflow vulnerability and explo
 
 ### **Binary Info**
 
-![Screenshot at 2024-09-26 12-50-04.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_12-50-04.png)
+![Screenshot at 2024-09-26 12-50-04.png](/static/Heap%20Exploitation%20Part%203%20{Heap%20Overflow}%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_12-50-04.png)
 
 You can see the information about the binary in the above image. i have recompiled this binary from the source code and disabled the stack canary and pie (Position Independent Executable) so that address of function does not change dynamicly every time we execute the binary..
 
@@ -103,11 +103,11 @@ In the `if else` block if the function pointer hold some value and its not empty
 
 By running and passing a string argument to the binary we see it works as expected.  
 
-![Screenshot at 2024-09-26 14-33-58.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_14-33-58.png)
+![Screenshot at 2024-09-26 14-33-58.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_14-33-58.png)
 *The string comparison fails and because the function pointer is assigned to the null so the `else` block executes and call the fail function.* 
 
 
-![Screenshot at 2024-09-26 14-41-50.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/b629a6fe-4269-4e2a-8309-cb8c22b116fe.png)
+![Screenshot at 2024-09-26 14-41-50.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/b629a6fe-4269-4e2a-8309-cb8c22b116fe.png)
 
 Now the string comparison is passed we can see it assigned the address of exploit function to the function pointer and now the `if` block is true which means the function pointer is not null or empty it holds some address and then `f->fp();`  invokes the exploit function. 
 
@@ -117,25 +117,25 @@ Now the string comparison is passed we can see it assigned the address of exploi
 
 So as we know that the strncmp function only check the first 9 character of our input let's try to input `exploited` followed by multiple `a` something like this `exploitedaaaaaaaaaaa.....`
 
-![Screenshot at 2024-09-26 17-19-07.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/9cd1d124-ef0a-4336-9cb2-c3d274dd20a8.png)
+![Screenshot at 2024-09-26 17-19-07.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/9cd1d124-ef0a-4336-9cb2-c3d274dd20a8.png)
 
 hmmmm. it doesn’t look like we are able to overflow the heap chunk lets give it some more a’s 
 
-![Screenshot at 2024-09-26 17-21-35.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/e7ab0639-1011-4530-8132-bd4f25260160.png)
+![Screenshot at 2024-09-26 17-21-35.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/e7ab0639-1011-4530-8132-bd4f25260160.png)
 
 Looks like we overflowed the heap and corrupted the top chunk’s size field but why we are able to overwrite the topcunk’s size field but not the function pointer. Because without overwriting the `functionpointer` chunk we can not overwrite the topchuck but we did overwrite the topchunk. we overflowed the function pointer so we as we know it should  point at the `0x6161616161616161` but still it points at `0x401210` which is the address of `exploit` function why this is happening. lets see why 
 
-![Screenshot at 2024-09-26 17-32-33.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-32-33.png)
+![Screenshot at 2024-09-26 17-32-33.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-32-33.png)
 
 so we can see we have two chunks the one will hold over string and other one holds the function pointer’s value. 
 
 so the now co to the strcpy instruction and see how over help looks like after the strcpy is done.
 
-![Screenshot at 2024-09-26 17-41-37.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-41-37.png)
+![Screenshot at 2024-09-26 17-41-37.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-41-37.png)
 
 You can see we did overflow the function pointer which is at `0x4052d0` and the value is `0x61616161` Now lets step up and see why the program behave differently.
 
-![Screenshot at 2024-09-26 18-23-42.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_18-23-42.png)
+![Screenshot at 2024-09-26 18-23-42.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_18-23-42.png)
 
 The strncmp compare the first 9 character of our input to `exploited` and if it is equal the it will change the function pointer to `exploit` function according to the programs logic. 
 
@@ -145,11 +145,11 @@ if (strncmp(value->string, "exploited", 9) == 0) {
 }
 ```
 
-![Screenshot at 2024-09-26 18-34-43.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/103070e0-a6d9-408c-920b-018703d2fd79.png)
+![Screenshot at 2024-09-26 18-34-43.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/103070e0-a6d9-408c-920b-018703d2fd79.png)
 
 Here it gets intersting and so even we overwrite the funtion pointer in the starting as the  programm progress and gets to `strncmp` condition. it will again overwrite the fuction pointer to `exploit` function.
 
-![Screenshot at 2024-09-26 18-41-20.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/973adb6a-cc34-46ad-a323-5b9774ad0ede.png)
+![Screenshot at 2024-09-26 18-41-20.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/973adb6a-cc34-46ad-a323-5b9774ad0ede.png)
 
 See the address `0x4052d0` holds the address of exploit function which is `0x401210`.
 
@@ -165,7 +165,7 @@ How do we exploit this? you may be asking the answer is very simple we don’t h
 
 so lets try something different insted of passing `exploited` wee will pass bunch of `A's` 
 
-![Screenshot at 2024-09-26 18-57-18.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_18-57-18.png)
+![Screenshot at 2024-09-26 18-57-18.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_18-57-18.png)
 
 Now we get over lovely `segfault` because over function pointer  calls the `0x61616161616161` which is not a valid address and that’s why we get segfault. So the exploitation phases is very easy we just have to calculate how many bytes we have to overwrite so we can write the address `shell` function to the function pointer. 
 
@@ -173,11 +173,11 @@ There are two ways to calculate the address you can choose any one you like i wi
 
 ***Using the cyclic pattern*** 
 
-![Screenshot at 2024-09-26 19-07-09.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/91c15284-d609-4547-977c-fa7f77b1a58f.png)
+![Screenshot at 2024-09-26 19-07-09.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/91c15284-d609-4547-977c-fa7f77b1a58f.png)
 
 ***Using Heap Layout***
 
-![Screenshot at 2024-09-26 17-32-33.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-32-33%201.png)
+![Screenshot at 2024-09-26 17-32-33.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-32-33%201.png)
 
 Over input gets written at `0x4052a0` and the function pointer value stored at `0x4052d0` if we minus `0x4052d0 - 0x4052a0` we get `0x30` which converted to integer is `48` so we need to pass `48` `A` followed by the address of `shell` function. 
 
@@ -205,7 +205,7 @@ In this exploit i used the elf function of pwn tools which help me to get the ad
 
 Lets execute the exploit and see are did i worte the correct exploit 
 
-![Screenshot at 2024-09-26 20-09-42.png](Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_20-09-42.png)
+![Screenshot at 2024-09-26 20-09-42.png](/static/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_20-09-42.png)
 
 Boom!! it worked in the first try. you can see the exploit is successfull and i got the shell.
 
