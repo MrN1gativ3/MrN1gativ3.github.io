@@ -10,7 +10,7 @@
 <meta name="description" content="Heap Overflow">
 <meta name="author" content="Mr_N1">
 <link rel="canonical" href="http://localhost:1313/posts/heapexp3/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.a5781257de4197b8e3d54346acdf1dd55a9ba4cb91dcace192fc1baf228c08b5.css" integrity="sha256-pXgSV95Bl7jj1UNGrN8d1VqbpMuR3KzhkvwbryKMCLU=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2846fd1f2998a1fa9b915df960aef781eb2a0bd48e18d1d90d158327a491a7a3.css" integrity="sha256-KEb9HymYofqbkV35YK73gesqC9SOGNHZDRWDJ6SRp6M=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -230,7 +230,7 @@
 <p>In this post we will take look at a simple heap overflow vulnerability and exploit the binary. The goal of this challenge to execute the shell function by exploiting the heapoverflow vulnerability.</p>
 <hr>
 <h3 id="binary-info"><strong>Binary Info</strong><a hidden class="anchor" aria-hidden="true" href="#binary-info">#</a></h3>
-<p><img alt="Screenshot at 2024-09-26 12-50-04.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_12-50-04.png"></p>
+<p><img alt="Screenshot at 2024-09-26 12-50-04.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_12-50-04.png"></p>
 <p>You can see the information about the binary in the above image. i have recompiled this binary from the source code and disabled the stack canary and pie (Position Independent Executable) so that address of function does not change dynamicly every time we execute the binary..</p>
 <hr>
 <h3 id="code-analysis"><strong>Code Analysis</strong><a hidden class="anchor" aria-hidden="true" href="#code-analysis">#</a></h3>
@@ -302,30 +302,30 @@
 <hr>
 <h3 id="debugging"><strong>Debugging</strong><a hidden class="anchor" aria-hidden="true" href="#debugging">#</a></h3>
 <p>By running and passing a string argument to the binary we see it works as expected.</p>
-<p><img alt="Screenshot at 2024-09-26 14-33-58.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_14-33-58.png">
+<p><img alt="Screenshot at 2024-09-26 14-33-58.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_14-33-58.png">
 <em>The string comparison fails and because the function pointer is assigned to the null so the <code>else</code> block executes and call the fail function.</em></p>
-<p><img alt="Screenshot at 2024-09-26 14-41-50.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/b629a6fe-4269-4e2a-8309-cb8c22b116fe.png"></p>
+<p><img alt="Screenshot at 2024-09-26 14-41-50.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/b629a6fe-4269-4e2a-8309-cb8c22b116fe.png"></p>
 <p>Now the string comparison is passed we can see it assigned the address of exploit function to the function pointer and now the <code>if</code> block is true which means the function pointer is not null or empty it holds some address and then <code>f-&gt;fp();</code>  invokes the exploit function.</p>
 <p><em>So now we have a clear understanding of the binary so how do we execute <code>shell</code> function and get a shell. One thing we can do is we can over flow the heap and overwrite the function pointers value because if you look at the <code>strcpy</code> function there is no string length check is being performed which means you can provide arbitrary length of input data and it <code>strcpy</code> will copy it to the heap which will cause an overflow.</em></p>
 <h3 id="rabbithole-of-exploited"><strong>RabbitHole of exploited</strong><a hidden class="anchor" aria-hidden="true" href="#rabbithole-of-exploited">#</a></h3>
 <p>So as we know that the strncmp function only check the first 9 character of our input let&rsquo;s try to input <code>exploited</code> followed by multiple <code>a</code> something like this <code>exploitedaaaaaaaaaaa.....</code></p>
-<p><img alt="Screenshot at 2024-09-26 17-19-07.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/9cd1d124-ef0a-4336-9cb2-c3d274dd20a8.png"></p>
+<p><img alt="Screenshot at 2024-09-26 17-19-07.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/9cd1d124-ef0a-4336-9cb2-c3d274dd20a8.png"></p>
 <p>hmmmm. it doesn’t look like we are able to overflow the heap chunk lets give it some more a’s</p>
-<p><img alt="Screenshot at 2024-09-26 17-21-35.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/e7ab0639-1011-4530-8132-bd4f25260160.png"></p>
+<p><img alt="Screenshot at 2024-09-26 17-21-35.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/e7ab0639-1011-4530-8132-bd4f25260160.png"></p>
 <p>Looks like we overflowed the heap and corrupted the top chunk’s size field but why we are able to overwrite the topcunk’s size field but not the function pointer. Because without overwriting the <code>functionpointer</code> chunk we can not overwrite the topchuck but we did overwrite the topchunk. we overflowed the function pointer so we as we know it should  point at the <code>0x6161616161616161</code> but still it points at <code>0x401210</code> which is the address of <code>exploit</code> function why this is happening. lets see why</p>
-<p><img alt="Screenshot at 2024-09-26 17-32-33.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-32-33.png"></p>
+<p><img alt="Screenshot at 2024-09-26 17-32-33.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-32-33.png"></p>
 <p>so we can see we have two chunks the one will hold over string and other one holds the function pointer’s value.</p>
 <p>so the now co to the strcpy instruction and see how over help looks like after the strcpy is done.</p>
-<p><img alt="Screenshot at 2024-09-26 17-41-37.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-41-37.png"></p>
+<p><img alt="Screenshot at 2024-09-26 17-41-37.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-41-37.png"></p>
 <p>You can see we did overflow the function pointer which is at <code>0x4052d0</code> and the value is <code>0x61616161</code> Now lets step up and see why the program behave differently.</p>
-<p><img alt="Screenshot at 2024-09-26 18-23-42.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_18-23-42.png"></p>
+<p><img alt="Screenshot at 2024-09-26 18-23-42.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_18-23-42.png"></p>
 <p>The strncmp compare the first 9 character of our input to <code>exploited</code> and if it is equal the it will change the function pointer to <code>exploit</code> function according to the programs logic.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nf">strncmp</span><span class="p">(</span><span class="n">value</span><span class="o">-&gt;</span><span class="n">string</span><span class="p">,</span> <span class="s">&#34;exploited&#34;</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">		<span class="n">f</span><span class="o">-&gt;</span><span class="n">fp</span> <span class="o">=</span> <span class="n">exploit</span><span class="p">;</span>  
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p><img alt="Screenshot at 2024-09-26 18-34-43.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/103070e0-a6d9-408c-920b-018703d2fd79.png"></p>
+</span></span></code></pre></div><p><img alt="Screenshot at 2024-09-26 18-34-43.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/103070e0-a6d9-408c-920b-018703d2fd79.png"></p>
 <p>Here it gets intersting and so even we overwrite the funtion pointer in the starting as the  programm progress and gets to <code>strncmp</code> condition. it will again overwrite the fuction pointer to <code>exploit</code> function.</p>
-<p><img alt="Screenshot at 2024-09-26 18-41-20.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/973adb6a-cc34-46ad-a323-5b9774ad0ede.png"></p>
+<p><img alt="Screenshot at 2024-09-26 18-41-20.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/973adb6a-cc34-46ad-a323-5b9774ad0ede.png"></p>
 <p>See the address <code>0x4052d0</code> holds the address of exploit function which is <code>0x401210</code>.</p>
 <p>And after that the program works as expected it checks weather the function pointer holds some value. Then it execute that function pointer.</p>
 <p>That’s why the program was always executed the <code>exploit</code> function.</p>
@@ -333,13 +333,13 @@
 <h3 id="exploitation"><strong>Exploitation</strong><a hidden class="anchor" aria-hidden="true" href="#exploitation">#</a></h3>
 <p>How do we exploit this? you may be asking the answer is very simple we don’t have to pass the strcnmp check because if we pass the check eventually the program will change the value of function pointer to <code>exploit</code> which we don’t want to.</p>
 <p>so lets try something different insted of passing <code>exploited</code> wee will pass bunch of <code>A's</code></p>
-<p><img alt="Screenshot at 2024-09-26 18-57-18.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_18-57-18.png"></p>
+<p><img alt="Screenshot at 2024-09-26 18-57-18.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_18-57-18.png"></p>
 <p>Now we get over lovely <code>segfault</code> because over function pointer  calls the <code>0x61616161616161</code> which is not a valid address and that’s why we get segfault. So the exploitation phases is very easy we just have to calculate how many bytes we have to overwrite so we can write the address <code>shell</code> function to the function pointer.</p>
 <p>There are two ways to calculate the address you can choose any one you like i will show you the both.</p>
 <p><em><strong>Using the cyclic pattern</strong></em></p>
-<p><img alt="Screenshot at 2024-09-26 19-07-09.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/91c15284-d609-4547-977c-fa7f77b1a58f.png"></p>
+<p><img alt="Screenshot at 2024-09-26 19-07-09.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/91c15284-d609-4547-977c-fa7f77b1a58f.png"></p>
 <p><em><strong>Using Heap Layout</strong></em></p>
-<p><img alt="Screenshot at 2024-09-26 17-32-33.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-32-33%201.png"></p>
+<p><img alt="Screenshot at 2024-09-26 17-32-33.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_17-32-33%201.png"></p>
 <p>Over input gets written at <code>0x4052a0</code> and the function pointer value stored at <code>0x4052d0</code> if we minus <code>0x4052d0 - 0x4052a0</code> we get <code>0x30</code> which converted to integer is <code>48</code> so we need to pass <code>48</code> <code>A</code> followed by the address of <code>shell</code> function.</p>
 <h3 id="exploit"><strong>Exploit</strong><a hidden class="anchor" aria-hidden="true" href="#exploit">#</a></h3>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="ch">#!/bin/python3</span>
@@ -359,7 +359,7 @@
 </span></span><span class="line"><span class="cl"><span class="n">target</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
 </span></span></code></pre></div><p>In this exploit i used the elf function of pwn tools which help me to get the address of shell function which is <code>0x4011f6</code> I use the elf function it make my exploitation process very easy.</p>
 <p>Lets execute the exploit and see are did i worte the correct exploit</p>
-<p><img alt="Screenshot at 2024-09-26 20-09-42.png" loading="lazy" src="Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_20-09-42.png"></p>
+<p><img alt="Screenshot at 2024-09-26 20-09-42.png" loading="lazy" src="/Heap%20Exploitation%20Part%203%20%7BHeap%20Overflow%7D%2039636a134fcd474aa1c13f9990b1fb87/Screenshot_at_2024-09-26_20-09-42.png"></p>
 <p>Boom!! it worked in the first try. you can see the exploit is successfull and i got the shell.</p>
 
 

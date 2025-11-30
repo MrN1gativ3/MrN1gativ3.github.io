@@ -32,7 +32,7 @@ Overhead: 32 - 10 = 22 bytes
 > **Allocated Chunk Example**
 > 
 
-![image.png](/static/heap_images/image.png)
+![image.png](/heap_images/image.png)
 
 After that heap manager mark this chunk as allocated and returns a pointer to the “User Data” region inside the chunk. which is the same return pointer you get from the malloc after the memory allocation.
 
@@ -59,13 +59,13 @@ The heap manager has multiple free lists, also known as bins. These bins store a
 
 When you request memory from the heap manager, it will search through the bins and try to find a free chunk that can fit the requested size. If the heap manager finds a chunk that is big enough to fulfill your allocation request, it will mark that chunk as allocated and return a pointer to the "User Data" area to the program. After that chunk is no longer in use and gets freed, the heap manager will add that chunk back to the free list (bin).
 
-![image.png](/static/heap_images/image2.png)
+![image.png](/heap_images/image2.png)
 
 ### **Allocation From Top Chunk**
 
 The top chunk is a unique feature of the GLIBC memory allocator. It represents the last free chunk in the heap and is notable for being the largest among all the chunks. This chunk can be dynamically expanded as needed. There is only one top chunk in the entire heap. If the heap manager fails to find a suitable free chunk that matches desired allocation request, then it will create a new chunk from the top chunk and resize the top chunk accordingly and allocate that newly create chunk to the program.
 
-![image.png](/static/heap_images/image%202.png)
+![image.png](/heap_images/image%202.png)
 
 ### **Requesting Kernel For Extra Heap Memory**
 
@@ -73,11 +73,11 @@ When the heap memory is fully exhausted or there is insufficient memory availabl
 
 **Heap Layout Before sbrk Syscall**
 
-![Screenshot from 2024-08-15 23-52-42.png](/static/heap_images/Screenshot_from_2024-08-15_23-52-42.png)
+![Screenshot from 2024-08-15 23-52-42.png](/heap_images/Screenshot_from_2024-08-15_23-52-42.png)
 
 **Heap Layout After sbrk Syscall** 
 
-![Screenshot from 2024-08-15 23-54-52.png](/static/heap_images/a54725da-7e96-4e59-bede-1caeace4ae4a.png)
+![Screenshot from 2024-08-15 23-54-52.png](/heap_images/a54725da-7e96-4e59-bede-1caeace4ae4a.png)
 
 ### **Using mmap for Larger Allocation**
 
@@ -91,19 +91,19 @@ Larger memory chunks are allocated using `mmap`. When a program requests a chunk
 
 In glibc’s ptmalloc, when a chunk of memory is freed, the allocator updates the chunk's metadata to reflect its new status as free. This involves setting the `prev_size` field (which holds the size of the previous chunk) and adjusting the `size` field to indicate that the chunk is no longer allocated. The `in_use` flag is cleared to mark the chunk as available. Optionally, the allocator may zero out the chunk's data to prevent residual data from being exposed, although this is not always performed due to performance trade-offs. Once the chunk’s metadata is updated, it is prepared for insertion into the appropriate free list or bin, based on its size and the allocator’s configuration.
 
-![image.png](/static/heap_images/image%203.png)
+![image.png](/heap_images/image%203.png)
 
 ### **2. Adding to Free Lists/Bins**
 
 After the chunk is marked as free, it is added to the appropriate free list or bin depending on its size and the state of the thread cache. If tcache is enabled and the chunk's size matches one of the tcache size classes, the chunk is placed into the corresponding thread-specific tcache bin. This bin is part of a per-thread cache designed to reduce allocation and deallocation latency by avoiding contention with other threads. If the chunk does not fit into any tcache bin—either because it is too large or tcache is not utilized—it is added to the global free list. The global free list is organized by size classes and is used to manage free chunks that can be shared among all threads, improving scalability.
 
-![image.png](/static/heap_images/image%204.png)
+![image.png](/heap_images/image%204.png)
 
 ### **3. Managing Free Lists**
 
 Effective management of free lists involves several critical operations to optimize memory usage and reduce fragmentation. When a chunk is inserted into a free list or bin, the allocator updates its metadata to integrate the chunk into the appropriate list for its size class. The chunk is linked to other free chunks using pointers maintained in the free list’s data structure. Additionally, if the freed chunk is adjacent to other free chunks in memory, ptmalloc performs coalescing, which merges these adjacent chunks into a single larger block. This reduces fragmentation and increases the size of contiguous free memory. The allocator continuously updates its internal data structures to reflect the changes, ensuring accurate tracking of available memory and maintaining efficient allocation strategies.
 
-![image.png](/static/heap_images/image%205.png)
+![image.png](/heap_images/image%205.png)
 
 ---
 
