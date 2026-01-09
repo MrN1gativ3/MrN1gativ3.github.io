@@ -28,17 +28,17 @@ languages:
       category: categories
       tag: tags
       series: series
-    menu:
-      main:
-        - name: Archive
-          url: archives
-          weight: 5
-        - name: Search
-          url: search/
-          weight: 10
-        - name: Tags
-          url: tags/
-          weight: 10
+    # menu:
+    #   main:
+    #     - name: Archive
+    #       url: archives
+    #       weight: 5
+    #     - name: Search
+    #       url: search/
+    #       weight: 10
+    #     - name: Tags
+    #       url: tags/
+    #       weight: 10
 
 outputs:
   home:
@@ -62,7 +62,7 @@ params:
   ShowBreadCrumbs: true
   ShowCodeCopyButtons: true
   ShowRssButtonInSectionTermList: true
-  ShowAllPagesInArchive: true
+  ShowAllPagesInArchive: false 
   ShowPageNums: true
   ShowToc: true
   # comments: false
@@ -74,11 +74,11 @@ params:
     imageTitle: my image
     # imageWidth: 120
     # imageHeight: 120
-    buttons:
-      - name: Archives
-        url: archives
-      - name: Tags
-        url: tags
+    # buttons:
+    #   - name: Archives
+    #     url: archives
+    #   - name: Tags
+    #     url: tags
 
   homeInfoParams:
     Title: "Mr_N₁gativ3 Blog"
@@ -94,7 +94,7 @@ params:
       # url: "https://discord.gg/ahpmTvhVmp"
     - name: X
       title: Share PaperMod on X/Twitter
-      url: "https://x.com/stackxbyte"
+      url: "https://x.com/mrn1gativ3"
     
    # label:
   # iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960" fill="currentColor"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>'

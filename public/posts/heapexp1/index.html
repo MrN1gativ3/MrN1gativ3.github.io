@@ -10,7 +10,7 @@
 <meta name="description" content="Exploring GLIBC Heap">
 <meta name="author" content="Mr_N1">
 <link rel="canonical" href="http://localhost:1313/posts/heapexp1/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.2846fd1f2998a1fa9b915df960aef781eb2a0bd48e18d1d90d158327a491a7a3.css" integrity="sha256-KEb9HymYofqbkV35YK73gesqC9SOGNHZDRWDJ6SRp6M=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.22f2cc5cb4fa8f4b56b0269f467e57bfab62ba61cb98c0cdde96bd7e08ab037e.css" integrity="sha256-IvLMXLT6j0tWsCafRn5Xv6tiumHLmMDN3pa9fgirA34=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -167,21 +167,6 @@
             </div>
         </div>
         <ul id="menu">
-            <li>
-                <a href="http://localhost:1313/archives" title="Archive">
-                    <span>Archive</span>
-                </a>
-            </li>
-            <li>
-                <a href="http://localhost:1313/search/" title="Search">
-                    <span>Search</span>
-                </a>
-            </li>
-            <li>
-                <a href="http://localhost:1313/tags/" title="Tags">
-                    <span>Tags</span>
-                </a>
-            </li>
         </ul>
     </nav>
 </header>
@@ -277,11 +262,14 @@
 <p>The current memory allocater used in linux is <strong>ptmalloc3</strong> it is an evolution of the ptmalloc (POSIX threads malloc) allocator, which itself is a fork of Doug Lea&rsquo;s original dlmalloc. ptmalloc3 represents a significant enhancement over its predecessors, focusing on improving performance and scalability for multi-threaded applications.</p>
 <p><em>There are several other memory allocators created and used by different platforms</em></p>
 <blockquote>
-<p><strong>jemalloc</strong> initially created for FreeBSD, offers scalable multi-threaded memory allocation</p></blockquote>
+<p><strong>jemalloc</strong> initially created for FreeBSD, offers scalable multi-threaded memory allocation</p>
+</blockquote>
 <blockquote>
-<p><strong>tcmalloc</strong> (Thread-Caching malloc), developed by Google, is optimized for performance in multi-threaded environments</p></blockquote>
+<p><strong>tcmalloc</strong> (Thread-Caching malloc), developed by Google, is optimized for performance in multi-threaded environments</p>
+</blockquote>
 <blockquote>
-<p><strong>mimalloc</strong> introduced by Microsoft, focuses on compact memory usage, low latency, and high concurrency.</p></blockquote>
+<p><strong>mimalloc</strong> introduced by Microsoft, focuses on compact memory usage, low latency, and high concurrency.</p>
+</blockquote>
 <hr>
 <h2 id="arenas"><strong>Arenas</strong><a hidden class="anchor" aria-hidden="true" href="#arenas">#</a></h2>
 <p>Arenas in ptmalloc are dedicated memory management regions assigned to individual threads within the GLIBC heap allocator. Each thread that interacts with the heap is associated with its own arena. This design allows threads to perform memory allocations and deallocations independently, minimizing contention and improving performance in multi-threaded applications. Arenas manage memory blocks and metadata specific to each thread, optimizing memory usage and reducing synchronization overhead. When a thread requests memory from the heap, it interacts solely with its designated arena, ensuring efficient and scalable memory management across concurrent threads. Multiple arenas can exist simultaneously, dynamically created and managed by ptmalloc based on the application&rsquo;s threading requirements.</p>
@@ -311,7 +299,8 @@
 </span></span></code></pre></div><hr>
 <h2 id="chunks"><strong>Chunks</strong><a hidden class="anchor" aria-hidden="true" href="#chunks">#</a></h2>
 <blockquote>
-<p>A chunk refers to a contiguous block of memory managed by the allocator. Chunks are the fundamental units of memory that <code>malloc</code> manages and allocates to the program</p></blockquote>
+<p>A chunk refers to a contiguous block of memory managed by the allocator. Chunks are the fundamental units of memory that <code>malloc</code> manages and allocates to the program</p>
+</blockquote>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">Strurture of malloc chunk
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">struct malloc_chunk {
@@ -328,35 +317,40 @@
 </span></span><span class="line"><span class="cl">};
 </span></span></code></pre></div><p>Whenever you call the malloc function to allocate some block of memory it simply allocate that memory and return a pointer to that allocated memory area but in reality the actual size of the chunk is grater then the requested size of the chunk. This is because the allocator need to store some metadata for managing the heap.</p>
 <blockquote>
-<p><em>For example you requested 16 bytes of memory <strong>malloc(0x10)</strong> so the allocator will add some extra bytes to store the metadata in case of 64bit system it is 16 bytes so the actual size of the chunk is going to be  :: 16 bytes(requested size) + 16 bytes(metadata) = 32 bytes(actual allocation size)</em></p></blockquote>
+<p><em>For example you requested 16 bytes of memory <strong>malloc(0x10)</strong> so the allocator will add some extra bytes to store the metadata in case of 64bit system it is 16 bytes so the actual size of the chunk is going to be  :: 16 bytes(requested size) + 16 bytes(metadata) = 32 bytes(actual allocation size)</em></p>
+</blockquote>
 <blockquote>
-<p><em>For 32 bit system the size will be  ::  16 bytes(requested size) + 8 bytes(metadata) = 24 bytes(actual allocation size)</em></p></blockquote>
+<p><em>For 32 bit system the size will be  ::  16 bytes(requested size) + 8 bytes(metadata) = 24 bytes(actual allocation size)</em></p>
+</blockquote>
 <h2 id="chunk-metadata"><strong>Chunk Metadata</strong><a hidden class="anchor" aria-hidden="true" href="#chunk-metadata">#</a></h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">An allocated chunk looks like this:
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">chunk-&gt;     +-------------------------------------------+
-</span></span><span class="line"><span class="cl">            | Size of previous chunk, if unallocated    | <span class="p">&lt;</span><span class="nt">--</span> <span class="na">4</span> <span class="na">or</span> <span class="na">8</span> <span class="na">bytes</span>
-</span></span><span class="line"><span class="cl">            <span class="err">+</span><span class="na">-------------------------------------------</span><span class="err">+</span>
-</span></span><span class="line"><span class="cl">            <span class="err">|</span> <span class="na">Size</span> <span class="na">of</span> <span class="na">chunk</span><span class="err">,</span> <span class="na">in</span> <span class="na">bytes</span>             <span class="err">|</span><span class="na">A</span><span class="err">|</span><span class="na">M</span><span class="err">|</span><span class="na">P</span><span class="err">|</span>  <span class="err">&lt;</span><span class="na">--</span> <span class="na">4</span> <span class="na">or</span> <span class="na">8</span> <span class="na">bytes</span>
-</span></span><span class="line"><span class="cl"><span class="na">mem-</span><span class="p">&gt;</span>       +-------------------------------------------+
-</span></span><span class="line"><span class="cl">            | User data starts here...                  | <span class="p">&lt;</span><span class="nt">--</span> <span class="na">malloc_usable_size</span><span class="err">()</span> <span class="na">bytes</span>
-</span></span><span class="line"><span class="cl">            <span class="err">.</span>                                           <span class="err">.</span>
-</span></span><span class="line"><span class="cl">            <span class="err">.</span>                                           <span class="err">.</span>
-</span></span><span class="line"><span class="cl">            <span class="err">.</span>                                           <span class="err">|</span>
-</span></span><span class="line"><span class="cl"><span class="na">nextchunk-</span><span class="p">&gt;</span> +-------------------------------------------+
-</span></span><span class="line"><span class="cl">            | (size of chunk, but used for application) |  <span class="p">&lt;</span><span class="nt">--</span> <span class="na">4</span> <span class="na">or</span> <span class="na">8</span> <span class="na">bytes</span>
-</span></span><span class="line"><span class="cl">            <span class="err">+</span><span class="na">-------------------------------------------</span><span class="err">+</span>
-</span></span><span class="line"><span class="cl">            <span class="err">|</span> <span class="na">Size</span> <span class="na">of</span> <span class="na">next</span> <span class="na">chunk</span><span class="err">,</span> <span class="na">in</span> <span class="na">bytes</span>        <span class="err">|</span><span class="na">A</span><span class="err">|</span><span class="na">0</span><span class="err">|</span><span class="na">1</span><span class="err">|</span>  <span class="err">&lt;</span><span class="na">--</span> <span class="na">4</span> <span class="na">or</span> <span class="na">8</span> <span class="na">bytes</span>
-</span></span><span class="line"><span class="cl">            <span class="err">+</span><span class="na">-------------------------------------------</span><span class="err">+</span>
+</span></span><span class="line"><span class="cl">            | Size of previous chunk, if unallocated    | &lt;-- 4 or 8 bytes
+</span></span><span class="line"><span class="cl">            +-------------------------------------------+
+</span></span><span class="line"><span class="cl">            | Size of chunk, in bytes             |A|M|P|  &lt;-- 4 or 8 bytes
+</span></span><span class="line"><span class="cl">mem-&gt;       +-------------------------------------------+
+</span></span><span class="line"><span class="cl">            | User data starts here...                  | &lt;-- malloc_usable_size() bytes
+</span></span><span class="line"><span class="cl">            .                                           .
+</span></span><span class="line"><span class="cl">            .                                           .
+</span></span><span class="line"><span class="cl">            .                                           |
+</span></span><span class="line"><span class="cl">nextchunk-&gt; +-------------------------------------------+
+</span></span><span class="line"><span class="cl">            | (size of chunk, but used for application) |  &lt;-- 4 or 8 bytes
+</span></span><span class="line"><span class="cl">            +-------------------------------------------+
+</span></span><span class="line"><span class="cl">            | Size of next chunk, in bytes        |A|0|1|  &lt;-- 4 or 8 bytes
+</span></span><span class="line"><span class="cl">            +-------------------------------------------+
 </span></span></code></pre></div><p>Each chunk begins with a field that stores the size of the previous chunk, but only if the previous chunk is unallocated. This size field is either 4 or 8 bytes, depending on the system architecture. This field helps in coalescing adjacent free chunks to reduce fragmentation.</p>
 <p>The next field is the size of the current chunk, which also includes the size of its own header. This field is also either 4 or 8 bytes. Besides storing the chunk size, the least significant three bits of this field are used as flags: <code>A</code>, <code>M</code>, and <code>P</code></p>
 <p><strong>A</strong> (Allocated), <strong>M</strong> (Mmap), <strong>P</strong> (Previous In Use) bit fields.*</p>
 <blockquote>
-<p>The <code>A</code> bit, found as the least significant bit of a chunk&rsquo;s size field, tells whether the chunk is currently in use (<code>1</code>) or free (<code>0</code>). It&rsquo;s crucial for quickly checking if memory is available for allocation or if it&rsquo;s already allocated by the program.</p></blockquote>
+<p>The <code>A</code> bit, found as the least significant bit of a chunk&rsquo;s size field, tells whether the chunk is currently in use (<code>1</code>) or free (<code>0</code>). It&rsquo;s crucial for quickly checking if memory is available for allocation or if it&rsquo;s already allocated by the program.</p>
+</blockquote>
 <blockquote>
-<p>The <code>M</code> bit, the second least significant bit, distinguishes chunks allocated via <code>mmap</code> (<code>1</code>) from those managed by the heap (<code>0</code>). <code>mmap</code> is used for larger allocations to prevent heap fragmentation by managing memory differently from typical heap allocations</p></blockquote>
+<p>The <code>M</code> bit, the second least significant bit, distinguishes chunks allocated via <code>mmap</code> (<code>1</code>) from those managed by the heap (<code>0</code>). <code>mmap</code> is used for larger allocations to prevent heap fragmentation by managing memory differently from typical heap allocations</p>
+</blockquote>
 <blockquote>
-<p>The <code>P</code> bit, located as the third least significant bit, indicates if the previous chunk in memory is allocated (<code>1</code>) or free (<code>0</code>). This helps in merging adjacent free chunks to reduce fragmentation and optimize memory usage in the heap.</p></blockquote>
+<p>The <code>P</code> bit, located as the third least significant bit, indicates if the previous chunk in memory is allocated (<code>1</code>) or free (<code>0</code>). This helps in merging adjacent free chunks to reduce fragmentation and optimize memory usage in the heap.</p>
+</blockquote>
 <p>After the metadata fields, the chunk contains space for user data. The size of this area is determined by the <code>malloc_usable_size()</code> function, which tells us how much space is available for the application to store its data. This is where programs store the information they need to work with.</p>
 <p>After the user data section lies the beginning of the next chunk in memory. This subsequent chunk starts with a field that serves dual purposes: it holds the size of this next chunk and, just like the current chunk&rsquo;s size field, its least significant bits are used as flags. Specifically, these flags include the <code>A</code> flag (Allocated) indicating if the next chunk is allocated (1) or free (0), and the <code>P</code> flag (Previous In Use) to show if the current chunk is in use (1)</p>
 <hr>
@@ -369,8 +363,8 @@
 </span></span><span class="line"><span class="cl">+--------------+
 </span></span><span class="line"><span class="cl">       |
 </span></span><span class="line"><span class="cl">       v
-</span></span><span class="line"><span class="cl">+-------------+ <span class="p">&lt;</span><span class="nt">--</span><span class="p">&gt;</span> +-------------+ <span class="p">&lt;</span><span class="nt">--</span><span class="p">&gt;</span> +-------------+
-</span></span><span class="line"><span class="cl">| Chunk (fd)  |      | Chunk (fd)  |      | Chunk (fd)  | <span class="p">&lt;</span><span class="nt">--</span><span class="p">&gt;</span> NULL
+</span></span><span class="line"><span class="cl">+-------------+ &lt;--&gt; +-------------+ &lt;--&gt; +-------------+
+</span></span><span class="line"><span class="cl">| Chunk (fd)  |      | Chunk (fd)  |      | Chunk (fd)  | &lt;--&gt; NULL
 </span></span><span class="line"><span class="cl">|  Size A     |      |  Size A     |      |  Size A     |
 </span></span><span class="line"><span class="cl">+-------------+      +-------------+      +-------------+
 </span></span><span class="line"><span class="cl">|   ...       |
@@ -379,7 +373,7 @@
 </span></span><span class="line"><span class="cl">+-------------+
 </span></span><span class="line"><span class="cl">       |
 </span></span><span class="line"><span class="cl">       v
-</span></span><span class="line"><span class="cl">+-------------+ <span class="p">&lt;</span><span class="nt">--</span><span class="p">&gt;</span> NULL
+</span></span><span class="line"><span class="cl">+-------------+ &lt;--&gt; NULL
 </span></span><span class="line"><span class="cl">| Chunk (fd)  |
 </span></span><span class="line"><span class="cl">|  Size B     |
 </span></span><span class="line"><span class="cl">+-------------+
@@ -411,8 +405,8 @@
 </span></span><span class="line"><span class="cl">+--------------+
 </span></span><span class="line"><span class="cl">       |
 </span></span><span class="line"><span class="cl">       v
-</span></span><span class="line"><span class="cl">+-------------+ <span class="p">&lt;</span><span class="nt">--</span><span class="p">&gt;</span> +-------------+
-</span></span><span class="line"><span class="cl">| Chunk (fd)  |      | Chunk (fd)  | <span class="p">&lt;</span><span class="nt">--</span><span class="p">&gt;</span> NULL
+</span></span><span class="line"><span class="cl">+-------------+ &lt;--&gt; +-------------+
+</span></span><span class="line"><span class="cl">| Chunk (fd)  |      | Chunk (fd)  | &lt;--&gt; NULL
 </span></span><span class="line"><span class="cl">|  Size A     |      |  Size A     |
 </span></span><span class="line"><span class="cl">+-------------+      +-------------+
 </span></span><span class="line"><span class="cl">|   ...       |
@@ -421,12 +415,12 @@
 </span></span><span class="line"><span class="cl">+-------------+
 </span></span><span class="line"><span class="cl">       |
 </span></span><span class="line"><span class="cl">       v
-</span></span><span class="line"><span class="cl">+-------------+ <span class="p">&lt;</span><span class="nt">--</span><span class="p">&gt;</span> NULL
+</span></span><span class="line"><span class="cl">+-------------+ &lt;--&gt; NULL
 </span></span><span class="line"><span class="cl">| Chunk (fd)  |
 </span></span><span class="line"><span class="cl">|  Size B     |
 </span></span><span class="line"><span class="cl">+-------------+
 </span></span></code></pre></div><p><em><strong>Tcache bins</strong></em> also use singly linked lists with the <code>fd</code> pointer but are stored in thread-local storage to improve performance and reduce contention. There are 64 Tcache bins, each corresponding to a specific size class, similar to Fastbins, but they can hold a limited number of chunks (typically 64 per bin). This caching mechanism speeds up allocation and deallocation operations by avoiding global locks and directly accessing recently freed chunks within the same thread.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">Tcache Bins ( <span class="err">&lt;</span>= 64 bytes)
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">Tcache Bins ( &lt;= 64 bytes)
 </span></span><span class="line"><span class="cl">+------------+
 </span></span><span class="line"><span class="cl">| Tcache[0]  |
 </span></span><span class="line"><span class="cl">+------------+
@@ -551,7 +545,7 @@ Reference
     </main>
     
 <footer class="footer">
-        <span>&copy; 2025 <a href="http://localhost:1313/">Mr_N₁gativ3</a></span> · 
+        <span>&copy; 2026 <a href="http://localhost:1313/">Mr_N₁gativ3</a></span> · 
 
     <span>
         Powered by

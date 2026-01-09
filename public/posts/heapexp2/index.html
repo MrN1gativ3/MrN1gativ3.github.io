@@ -10,7 +10,7 @@
 <meta name="description" content="Memory Allocation and Deallocation Process">
 <meta name="author" content="Mr_N1">
 <link rel="canonical" href="http://localhost:1313/posts/heapexp2/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.2846fd1f2998a1fa9b915df960aef781eb2a0bd48e18d1d90d158327a491a7a3.css" integrity="sha256-KEb9HymYofqbkV35YK73gesqC9SOGNHZDRWDJ6SRp6M=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.22f2cc5cb4fa8f4b56b0269f467e57bfab62ba61cb98c0cdde96bd7e08ab037e.css" integrity="sha256-IvLMXLT6j0tWsCafRn5Xv6tiumHLmMDN3pa9fgirA34=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -167,21 +167,6 @@
             </div>
         </div>
         <ul id="menu">
-            <li>
-                <a href="http://localhost:1313/archives" title="Archive">
-                    <span>Archive</span>
-                </a>
-            </li>
-            <li>
-                <a href="http://localhost:1313/search/" title="Search">
-                    <span>Search</span>
-                </a>
-            </li>
-            <li>
-                <a href="http://localhost:1313/tags/" title="Tags">
-                    <span>Tags</span>
-                </a>
-            </li>
         </ul>
     </nav>
 </header>
@@ -241,14 +226,16 @@
 <p>When you request memory for your program, for example, 0x10 bytes of memory, by calling <code>malloc</code>, it returns a pointer to the allocated memory space where you can store your data. However, the allocation process involves more than simply providing 16 bytes of free memory space.</p>
 <p>The heap manager performs several additional tasks behind the scenes. It keeps track of all allocated memory chunks by storing metadata alongside the user-requested space. This metadata includes information such as the size of the allocated chunk and its status (e.g., whether it is free or in use). Additionally, the heap manager ensures proper memory alignment for better efficiency. On 32-bit systems, memory is typically aligned to 0x8 (8) bytes, while on 64-bit systems, it is aligned to 0x10 (16) bytes.</p>
 <blockquote>
-<p>When you request 0x10 (16) bytes of memory, the heap manager actually allocates more than just 16 bytes. In practice, it typically allocates a total of 32 bytes. This allocation includes 16 bytes for metadata or a header, which contains information about the allocated chunk, such as its size and status. Additionally, it includes the 16 bytes you requested for storing your data. To ensure proper alignment, particularly on 64-bit systems where memory is aligned to 16-byte blocks, 6 bytes of padding are added. This padding ensures that the memory allocation is aligned correctly, making the total allocated memory 32 bytes, accommodating both the user-requested space and the necessary overhead for metadata and alignment.</p></blockquote>
+<p>When you request 0x10 (16) bytes of memory, the heap manager actually allocates more than just 16 bytes. In practice, it typically allocates a total of 32 bytes. This allocation includes 16 bytes for metadata or a header, which contains information about the allocated chunk, such as its size and status. Additionally, it includes the 16 bytes you requested for storing your data. To ensure proper alignment, particularly on 64-bit systems where memory is aligned to 16-byte blocks, 6 bytes of padding are added. This padding ensures that the memory allocation is aligned correctly, making the total allocated memory 32 bytes, accommodating both the user-requested space and the necessary overhead for metadata and alignment.</p>
+</blockquote>
 <pre tabindex="0"><code>Requested Size: 10 bytes
 Total Without Alignment: 10 + 16 = 26 bytes
 Alignment Padding: To align to 16 bytes, we need 6 more bytes to reach 32 bytes
 Total Allocated Size: 32 bytes
 Overhead: 32 - 10 = 22 bytes
 </code></pre><blockquote>
-<p><strong>Allocated Chunk Example</strong></p></blockquote>
+<p><strong>Allocated Chunk Example</strong></p>
+</blockquote>
 <p><img alt="image.png" loading="lazy" src="/heap_images/image.png"></p>
 <p>After that heap manager mark this chunk as allocated and returns a pointer to the “User Data” region inside the chunk. which is the same return pointer you get from the malloc after the memory allocation.</p>
 <hr>
@@ -389,7 +376,7 @@ Overhead: 32 - 10 = 22 bytes
     </main>
     
 <footer class="footer">
-        <span>&copy; 2025 <a href="http://localhost:1313/">Mr_N₁gativ3</a></span> · 
+        <span>&copy; 2026 <a href="http://localhost:1313/">Mr_N₁gativ3</a></span> · 
 
     <span>
         Powered by
