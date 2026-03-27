@@ -1,0 +1,126 @@
+{{ define "main" }}
+  {{ $hero := "" }}
+  {{ $heroCard := default "" .Params.animcard }}
+  {{ $heroCardTitle := default "" .Params.animcardtitle }}
+  {{ $heroCardNote := default "" .Params.animcardnote }}
+  {{ with .Params.image }}
+    {{ with $.Resources.GetMatch . }}
+      {{ $hero = .RelPermalink }}
+    {{ else }}
+      {{ $hero = . | relURL }}
+    {{ end }}
+  {{ else }}
+    {{ with .Params.cover }}
+      {{ with .image }}
+        {{ with $.Resources.GetMatch . }}
+          {{ $hero = .RelPermalink }}
+        {{ else }}
+          {{ $hero = . | relURL }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+
+  {{ $description := .Description }}
+  {{ with .Params.intro }}
+    {{ $description = . }}
+  {{ end }}
+
+  {{ $tocMarkup := .TableOfContents }}
+  {{ $showToc := true }}
+  {{ if isset .Params "showtoc" }}
+    {{ $showToc = .Params.showtoc }}
+  {{ else }}
+    {{ if isset .Params "toc" }}
+      {{ $showToc = .Params.toc }}
+    {{ end }}
+  {{ end }}
+  {{ $tocOpen := false }}
+  {{ if isset .Params "tocopen" }}
+    {{ $tocOpen = .Params.tocopen }}
+  {{ end }}
+  {{ $hasToc := gt (len (findRE "<li" $tocMarkup)) 0 }}
+
+  <article class="post-single">
+    <header class="post-header">
+      <div class="breadcrumbs">
+        <a href="{{ "/" | relURL }}">Home</a>
+        {{ with .Section }}
+          <span>&middot;</span>
+          <a href="{{ printf "/%s/" . | relURL }}">{{ . | humanize }}</a>
+        {{ end }}
+      </div>
+      <h1 class="post-title">{{ .Title }}</h1>
+      {{ with $description }}
+        <div class="post-description">{{ . }}</div>
+      {{ end }}
+      <div class="post-meta">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02 Jan 2006" }}</time>
+        <span>&middot;</span>
+        <span>{{ .ReadingTime }} min</span>
+        {{ with site.Params.author }}
+          <span>&middot;</span>
+          <span>{{ . }}</span>
+        {{ end }}
+      </div>
+    </header>
+
+    {{ if $heroCard }}
+      <div class="post-cover post-cover-card">
+        {{ partial "animcard.html" (dict
+          "type" $heroCard
+          "title" $heroCardTitle
+          "note" $heroCardNote
+        ) }}
+      </div>
+    {{ else }}
+      {{ with $hero }}
+        <figure class="post-cover">
+          <img src="{{ . }}" alt="{{ $.Title }}">
+        </figure>
+      {{ end }}
+    {{ end }}
+
+    {{ if and $showToc $hasToc }}
+      <div class="toc">
+        <details{{ if $tocOpen }} open{{ end }}>
+          <summary><span class="details">Table of Contents</span></summary>
+          <div class="inner">
+            {{ $tocMarkup }}
+          </div>
+        </details>
+      </div>
+    {{ end }}
+
+    <div class="post-content">
+      {{ .Content }}
+    </div>
+
+    <footer class="post-footer">
+      {{ with .Params.tags }}
+        <ul class="post-tags">
+          {{ range . }}
+            <li><a href="{{ printf "/tags/%s/" (. | urlize) | relURL }}">#{{ . }}</a></li>
+          {{ end }}
+        </ul>
+      {{ end }}
+
+      {{ if or .PrevInSection .NextInSection }}
+        <nav class="paginav">
+          {{ with .PrevInSection }}
+            <a class="prev" href="{{ .RelPermalink }}">
+              <span class="title">&laquo; Previous</span><br>
+              <span>{{ .Title }}</span>
+            </a>
+          {{ end }}
+          {{ with .NextInSection }}
+            <a class="next" href="{{ .RelPermalink }}">
+              <span class="title">Next &raquo;</span><br>
+              <span>{{ .Title }}</span>
+            </a>
+          {{ end }}
+        </nav>
+      {{ end }}
+    </footer>
+  </article>
+{{ end }}

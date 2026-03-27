@@ -1,0 +1,128 @@
+{{- $typeRaw := lower (default "reversing" .type) -}}
+{{- $type := "reversing" -}}
+{{- if or (eq $typeRaw "malware") (eq $typeRaw "malware-analysis") -}}
+  {{- $type = "malware" -}}
+{{- else if or (eq $typeRaw "exploitation") (eq $typeRaw "heap-exploitation") -}}
+  {{- $type = "exploitation" -}}
+{{- else if or (eq $typeRaw "kernel") (eq $typeRaw "linux-kernel") -}}
+  {{- $type = "kernel" -}}
+{{- end -}}
+
+{{- $kickers := dict
+  "malware" "Malware Analysis"
+  "exploitation" "Exploitation"
+  "reversing" "Reversing"
+  "kernel" "Kernel"
+-}}
+
+{{- $titles := dict
+  "malware" "Packed Sample Trace"
+  "exploitation" "Heap Corruption Window"
+  "reversing" "Live Disassembly View"
+  "kernel" "Kernel Path Walk"
+-}}
+
+{{- $notes := dict
+  "malware" "Animated process chain, entropy bars, and beacon staging."
+  "exploitation" "Animated chunk layout, overwrite path, and target resolution."
+  "reversing" "Animated disassembly stream, register snapshots, and xref notes."
+  "kernel" "Animated syscall path, privilege crossing, and kernel object focus."
+-}}
+
+{{- $statuses := dict
+  "malware" "sandbox"
+  "exploitation" "overflow"
+  "reversing" "tracing"
+  "kernel" "ring0"
+-}}
+
+{{- $title := default (index $titles $type) .title -}}
+{{- $note := default (index $notes $type) .note -}}
+
+<div class="labcard labcard-{{ $type }}" data-labcard data-labcard-type="{{ $type }}">
+  <div class="labcard-head">
+    <div class="labcard-heading">
+      <p class="labcard-kicker">{{ index $kickers $type }}</p>
+      <h3 class="labcard-title">{{ $title }}</h3>
+      <p class="labcard-note">{{ $note }}</p>
+    </div>
+    <span class="labcard-status" data-lab-status>{{ index $statuses $type }}</span>
+  </div>
+
+  {{- if eq $type "malware" }}
+    <div class="labcard-body">
+      <div class="malware-flow">
+        <span class="malware-node" data-malware-node>dropper</span>
+        <span class="malware-node" data-malware-node>loader</span>
+        <span class="malware-node" data-malware-node>injector</span>
+        <span class="malware-node" data-malware-node>beacon</span>
+      </div>
+      <div class="labcard-meta">
+        <span class="labcard-mono" data-malware-hash>sha256: 7f3a...c91d</span>
+        <span class="labcard-mono" data-malware-family>family: unpacking</span>
+      </div>
+      <div class="malware-bars" data-malware-bars aria-hidden="true"></div>
+    </div>
+  {{- else if eq $type "exploitation" }}
+    <div class="labcard-body">
+      <div class="heap-lane">
+        <span class="heap-cell" data-heap-cell><strong>prev</strong><em>0x00</em></span>
+        <span class="heap-cell" data-heap-cell><strong>size</strong><em>0x91</em></span>
+        <span class="heap-cell" data-heap-cell><strong>user</strong><em>0x40</em></span>
+        <span class="heap-cell" data-heap-cell><strong>next</strong><em>victim</em></span>
+        <span class="heap-cell" data-heap-cell><strong>ptr</strong><em>hook</em></span>
+        <span class="heap-sweep" aria-hidden="true"></span>
+      </div>
+      <div class="heap-bins">
+        <span class="heap-bin" data-heap-bin>tcache</span>
+        <span class="heap-bin" data-heap-bin>fastbin</span>
+        <span class="heap-bin" data-heap-bin>unsorted</span>
+        <span class="heap-bin" data-heap-bin>hook</span>
+      </div>
+      <div class="labcard-meta">
+        <span class="labcard-mono" data-heap-pointer>write -&gt; __free_hook</span>
+        <span class="labcard-mono" data-heap-mode>mode: tcache poisoning</span>
+      </div>
+    </div>
+  {{- else if eq $type "kernel" }}
+    <div class="labcard-body">
+      <div class="kernel-path">
+        <span class="kernel-stage" data-kernel-stage>ring3</span>
+        <span class="kernel-stage" data-kernel-stage>syscall</span>
+        <span class="kernel-stage" data-kernel-stage>vfs</span>
+        <span class="kernel-stage" data-kernel-stage>lsm</span>
+        <span class="kernel-stage" data-kernel-stage>task</span>
+      </div>
+      <div class="kernel-rings">
+        <span class="kernel-pill" data-kernel-pill>current</span>
+        <span class="kernel-pill" data-kernel-pill>cred</span>
+        <span class="kernel-pill" data-kernel-pill>mm</span>
+        <span class="kernel-pill" data-kernel-pill>mmap_lock</span>
+      </div>
+      <div class="labcard-meta">
+        <span class="labcard-mono" data-kernel-symbol>symbol: current-&gt;mm</span>
+        <span class="labcard-mono" data-kernel-call>call: __x64_sys_read</span>
+      </div>
+    </div>
+  {{- else }}
+    <div class="labcard-body">
+      <div class="rev-disasm" data-rev-disasm>
+        <div class="rev-line" data-rev-line><span class="rev-marker">&gt;</span><span class="rev-addr">0x4011b0</span><span class="rev-op">push rbp</span></div>
+        <div class="rev-line" data-rev-line><span class="rev-marker">&gt;</span><span class="rev-addr">0x4011b1</span><span class="rev-op">mov rbp, rsp</span></div>
+        <div class="rev-line" data-rev-line><span class="rev-marker">&gt;</span><span class="rev-addr">0x4011b4</span><span class="rev-op">cmp eax, 0x91</span></div>
+        <div class="rev-line" data-rev-line><span class="rev-marker">&gt;</span><span class="rev-addr">0x4011b9</span><span class="rev-op">jne 0x4011d0</span></div>
+        <div class="rev-line" data-rev-line><span class="rev-marker">&gt;</span><span class="rev-addr">0x4011be</span><span class="rev-op">call qword ptr [rax]</span></div>
+      </div>
+      <div class="rev-registers">
+        <span class="rev-reg"><em>RAX</em><strong data-rev-reg="rax">0x0000</strong></span>
+        <span class="rev-reg"><em>RDI</em><strong data-rev-reg="rdi">0x404040</strong></span>
+        <span class="rev-reg"><em>RSP</em><strong data-rev-reg="rsp">0x7ffffff0</strong></span>
+        <span class="rev-reg"><em>XREF</em><strong data-rev-reg="xref">switch</strong></span>
+      </div>
+      <div class="labcard-meta">
+        <span class="labcard-mono" data-rev-note>xrefs -&gt; dispatcher table</span>
+        <span class="labcard-mono" data-rev-func>func: sub_4011b0</span>
+      </div>
+    </div>
+  {{- end }}
+</div>

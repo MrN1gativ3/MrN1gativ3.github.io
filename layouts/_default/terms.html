@@ -1,0 +1,15 @@
+{{ define "main" }}
+  <header class="page-header">
+    <h1>{{ .Title }}</h1>
+  </header>
+
+  <ul class="terms-tags">
+    {{ range .Data.Terms.Alphabetical }}
+      <li>
+        <a href="{{ .Page.RelPermalink }}">#{{ .Page.Title }}<sup><strong><sup>{{ .Count }}</sup></strong></sup></a>
+      </li>
+    {{ else }}
+      <p>No tags yet.</p>
+    {{ end }}
+  </ul>
+{{ end }}

@@ -1,0 +1,92 @@
+{{ define "main" }}
+  {{ $posts := where site.RegularPages "Section" "posts" }}
+
+  <article class="first-entry home-info">
+    <header class="entry-header">
+      <h1>{{ site.Params.homeTitle | default site.Title }}</h1>
+      <div class="home-trace" aria-label="Live trace console">
+        <div class="trace-head">
+          <span class="trace-dot"></span>
+          <span class="trace-dot"></span>
+          <span class="trace-dot"></span>
+          <span class="trace-title">rev://heap-map live</span>
+        </div>
+        <div class="trace-map">
+          <span class="trace-segment trace-segment-text" data-trace-segment="text"><strong>.text</strong><em>r-x</em></span>
+          <span class="trace-segment trace-segment-got" data-trace-segment="got"><strong>.got</strong><em>rw-</em></span>
+          <span class="trace-segment trace-segment-heap" data-trace-segment="heap"><strong>heap</strong><em>rw-</em></span>
+          <span class="trace-segment trace-segment-stack" data-trace-segment="stack"><strong>stack</strong><em>rw-</em></span>
+          <span class="trace-seeker" aria-hidden="true"></span>
+        </div>
+        <div class="trace-readout">
+          <span class="trace-prompt" data-trace-address>0x4012c0</span>
+          <span class="trace-command" data-trace-command>cmp chunk-&gt;size, 0x91</span>
+        </div>
+        <div class="trace-bytes" data-trace-bytes aria-hidden="true"></div>
+        <div class="trace-metrics">
+          <span class="trace-chip">focus:<strong data-trace-topic>heap-exploitation</strong></span>
+          <span class="trace-chip">stage:<strong data-trace-state>tcache watch</strong></span>
+          <span class="trace-chip">sig:<strong data-trace-hash>0x7fa1</strong></span>
+        </div>
+      </div>
+    </header>
+    <div class="entry-content">
+      {{ with site.Params.homeDescription }}<p>{{ . }}</p>{{ end }}
+      {{ with site.Params.homeIntro }}<p>{{ . }}</p>{{ end }}
+    </div>
+    <footer class="entry-footer">
+      {{ partial "social-links.html" . }}
+    </footer>
+  </article>
+
+  {{ with site.Taxonomies.tags }}
+    <section class="home-tags">
+      <header class="page-header">
+        <h2>Tags</h2>
+      </header>
+      <ul class="terms-tags">
+        {{ range first 12 .ByCount }}
+          <li>
+            <a href="{{ .Page.RelPermalink }}">#{{ .Page.Title }}<sup><strong><sup>{{ .Count }}</sup></strong></sup></a>
+          </li>
+        {{ end }}
+      </ul>
+    </section>
+  {{ end }}
+
+  {{ range $posts.ByDate.Reverse }}
+    <article class="post-entry">
+      <header class="entry-header">
+        <h2 class="entry-hint-parent"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      </header>
+
+      {{ if not .Params.hideSummary }}
+        {{ $summary := .Description }}
+        {{ if not $summary }}
+          {{ $summary = .Summary | plainify | truncate 220 }}
+        {{ end }}
+        {{ with $summary }}
+          <div class="entry-content">
+            <p>{{ . }}</p>
+          </div>
+        {{ end }}
+      {{ end }}
+
+      <footer class="entry-footer">
+        <span title="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</span>
+        <span>&middot;</span>
+        <span>{{ .ReadingTime }} min</span>
+        {{ with site.Params.author }}
+          <span>&middot;</span>
+          <span>{{ . }}</span>
+        {{ end }}
+      </footer>
+    </article>
+  {{ else }}
+    <article class="post-entry">
+      <header class="entry-header">
+        <h2>No posts yet</h2>
+      </header>
+    </article>
+  {{ end }}
+{{ end }}

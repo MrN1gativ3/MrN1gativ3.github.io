@@ -1,0 +1,8 @@
+/public/
+/resources/_gen/
+/.hugo_build.lock
+/.hugo-preview/
+/.hugo-cache/
+/.publish-temp/
+/.hugo-server.log
+/.hugo-server-error.log

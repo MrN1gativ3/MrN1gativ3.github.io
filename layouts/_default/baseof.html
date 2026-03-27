@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="{{ site.LanguageCode | default "en-us" }}" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      (() => {
+        try {
+          const stored = localStorage.getItem("theme");
+          const system = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          document.documentElement.dataset.theme = stored || system;
+        } catch (error) {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+    <title>
+      {{ if .IsHome }}
+        {{ site.Title }}
+      {{ else }}
+        {{ .Title }} | {{ site.Title }}
+      {{ end }}
+    </title>
+    <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}">
+    {{ with resources.Get "css/site.css" }}
+      {{ $styles := . | minify | fingerprint }}
+      <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}">
+    {{ end }}
+  </head>
+  <body class="{{ if .IsHome }}home {{ end }}{{ if .IsPage }}single{{ else }}list{{ end }}" id="top">
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">
+          <a href="{{ "/" | relURL }}">{{ site.Title }}</a>
+          <div class="logo-switches">
+            <button id="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+              <svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+              <svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <ul id="menu">
+          <li><a href="{{ "/" | relURL }}">Home</a></li>
+          <li><a href="{{ "/tags/" | relURL }}">Tags</a></li>
+          <li><a href="{{ "/archive/" | relURL }}">Archive</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="main">
+      {{ block "main" . }}{{ end }}
+    </main>
+
+    <footer class="footer">
+      <span>&copy; {{ now.Year }} <a href="{{ "/" | relURL }}">{{ site.Title }}</a></span>
+      <span>{{ site.Params.footerText }}</span>
+    </footer>
+
+    <a href="#top" aria-label="Go to top" title="Go to top" class="top-link" id="top-link">
+      <svg viewBox="0 0 12 6" fill="currentColor" aria-hidden="true">
+        <path d="M12 6H0l6-6z"></path>
+      </svg>
+    </a>
+
+    <script src="{{ "js/site.js" | relURL }}" defer></script>
+  </body>
+</html>

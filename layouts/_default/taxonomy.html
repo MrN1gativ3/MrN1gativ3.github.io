@@ -1,0 +1,37 @@
+{{ define "main" }}
+  <header class="page-header">
+    <h1>#{{ .Title }}</h1>
+  </header>
+
+  {{ range .Pages.ByDate.Reverse }}
+    <article class="post-entry">
+      <header class="entry-header">
+        <h2 class="entry-hint-parent"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      </header>
+
+      {{ if not .Params.hideSummary }}
+        {{ $summary := .Description }}
+        {{ if not $summary }}
+          {{ $summary = .Summary | plainify | truncate 220 }}
+        {{ end }}
+        {{ with $summary }}
+          <div class="entry-content">
+            <p>{{ . }}</p>
+          </div>
+        {{ end }}
+      {{ end }}
+
+      <footer class="entry-footer">
+        <span title="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</span>
+        <span>&middot;</span>
+        <span>{{ .ReadingTime }} min</span>
+      </footer>
+    </article>
+  {{ else }}
+    <article class="post-entry">
+      <header class="entry-header">
+        <h2>No posts match this tag yet</h2>
+      </header>
+    </article>
+  {{ end }}
+{{ end }}

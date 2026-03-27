@@ -1,0 +1,12 @@
+{{ with site.Params.social }}
+  <ul class="social-icons">
+    {{ range . }}
+      {{ $label := .label | default (.name | title) }}
+      <li>
+        <a href="{{ .url }}" title="{{ $label }}" {{ if not (hasPrefix .url "mailto:") }}target="_blank" rel="noopener noreferrer"{{ end }}>
+          {{ partial "social-icon.html" (dict "name" .name "label" $label) }}
+        </a>
+      </li>
+    {{ end }}
+  </ul>
+{{ end }}

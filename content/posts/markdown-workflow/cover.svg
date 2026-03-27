@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Markdown workflow cover</title>
+  <desc id="desc">Abstract illustration with editorial blocks and code lines.</desc>
+  <rect width="1200" height="630" fill="#f4f1ea" rx="28" />
+  <rect x="90" y="90" width="500" height="450" rx="24" fill="#ffffff" stroke="#d8d0c2" stroke-width="3" />
+  <rect x="650" y="130" width="420" height="300" rx="24" fill="#173c47" />
+  <rect x="145" y="170" width="310" height="20" rx="10" fill="#173c47" opacity="0.12" />
+  <rect x="145" y="220" width="390" height="18" rx="9" fill="#173c47" opacity="0.08" />
+  <rect x="145" y="260" width="360" height="18" rx="9" fill="#173c47" opacity="0.08" />
+  <rect x="145" y="300" width="275" height="18" rx="9" fill="#173c47" opacity="0.08" />
+  <rect x="720" y="200" width="280" height="18" rx="9" fill="#f1e8d9" opacity="0.9" />
+  <rect x="720" y="245" width="220" height="18" rx="9" fill="#f1e8d9" opacity="0.75" />
+  <rect x="720" y="290" width="300" height="18" rx="9" fill="#f1e8d9" opacity="0.55" />
+  <text x="90" y="585" fill="#1a1a1a" font-size="56" font-family="Georgia, serif">Markdown workflow</text>
+</svg>

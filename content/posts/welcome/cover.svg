@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Welcome cover</title>
+  <desc id="desc">A warm abstract illustration for the welcome post.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f7efe4" />
+      <stop offset="100%" stop-color="#e6d5bd" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" rx="28" />
+  <circle cx="215" cy="165" r="105" fill="#d07a4c" opacity="0.85" />
+  <circle cx="980" cy="430" r="145" fill="#214b42" opacity="0.9" />
+  <rect x="120" y="350" width="450" height="18" rx="9" fill="#214b42" opacity="0.2" />
+  <rect x="120" y="390" width="350" height="18" rx="9" fill="#214b42" opacity="0.14" />
+  <text x="120" y="280" fill="#1a1a1a" font-size="68" font-family="Georgia, serif">Welcome to the Minimal Blog</text>
+  <text x="120" y="330" fill="#3b3b3b" font-size="28" font-family="Arial, sans-serif">Small posts, bundled images, and a clean Markdown workflow.</text>
+</svg>

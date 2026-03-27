@@ -1,0 +1,49 @@
+baseURL = "https://mrn1gativ3.github.io/"
+languageCode = "en-us"
+title = "MrN1gativ3"
+enableRobotsTXT = true
+
+[taxonomies]
+tag = "tags"
+
+[params]
+author = "MrN1gativ3"
+description = "Linux kernel, heap exploitation, reversing, malware analysis, process injection, and practical technical notes."
+homeTitle = "MrN1gativ3"
+homeDescription = "A small blog for short posts, technical deep dives, code, screenshots, and things worth keeping."
+homeIntro = "Expect notes on linux kernel internals, heap exploitation, reversing, malware analysis, process injection, and adjacent experiments."
+footerText = "Built with Hugo. Written in Markdown."
+
+[[params.social]]
+name = "linkedin"
+label = "LinkedIn"
+url = "https://www.linkedin.com/in/vikasmishra001/"
+
+[[params.social]]
+name = "github"
+label = "GitHub"
+url = "https://github.com/MrN1gativ3"
+
+[[params.social]]
+name = "x"
+label = "X"
+url = "https://x.com/MrN1gativ3"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    lineNos = false
+    noClasses = true
+    style = "github-dark"
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+    ordered = false
+
+[caches]
+  [caches.images]
+    dir = ":cacheDir/images"
