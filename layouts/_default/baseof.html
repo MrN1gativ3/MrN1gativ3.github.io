@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ site.LanguageCode | default "en-us" }}" data-theme="light">
+<html lang="{{ site.LanguageCode | default "en-us" }}" data-theme="dark">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,10 +8,9 @@
       (() => {
         try {
           const stored = localStorage.getItem("theme");
-          const system = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-          document.documentElement.dataset.theme = stored || system;
+          document.documentElement.dataset.theme = stored || "dark";
         } catch (error) {
-          document.documentElement.dataset.theme = "light";
+          document.documentElement.dataset.theme = "dark";
         }
       })();
     </script>

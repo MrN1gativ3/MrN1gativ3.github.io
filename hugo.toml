@@ -37,8 +37,8 @@ url = "https://x.com/MrN1gativ3"
     codeFences = true
     guessSyntax = true
     lineNos = false
-    noClasses = true
-    style = "github-dark"
+    noClasses = false
+    style = "github"
   [markup.tableOfContents]
     startLevel = 2
     endLevel = 4

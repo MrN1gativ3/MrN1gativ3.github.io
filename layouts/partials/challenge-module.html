@@ -1,0 +1,291 @@
+{{- $kind := lower (default "heap" .kind) -}}
+<div class="playlab playlab-{{ $kind }}{{ with .scope }} playlab-{{ . }}{{ end }}" data-playlab="{{ $kind }}">
+  {{- if eq $kind "malware" }}
+    <div class="playlab-brief">
+      <div>
+        <p class="playlab-label">malware triage</p>
+        <p class="playlab-objective">Work the sample the way you would in a real triage pass: validate the unpack pivot, identify the cross-process launch, and recover the live C2 path.</p>
+      </div>
+      <button class="playlab-reset" type="button" data-playlab-reset>reset session</button>
+    </div>
+
+    <div class="playlab-grid playlab-grid-malware">
+      <div class="playlab-main">
+        <div class="playlab-progress">
+          <span class="playlab-stage" data-playlab-stage="triage">triage</span>
+          <span class="playlab-stage" data-playlab-stage="unpack">loader</span>
+          <span class="playlab-stage" data-playlab-stage="inject">launch</span>
+          <span class="playlab-stage" data-playlab-stage="beacon">c2</span>
+        </div>
+
+        <div class="mal-playground">
+          <button class="mal-artifact" type="button" data-mal-probe="spawn">
+            <span class="mal-artifact-badge">proc</span>
+            <strong class="mal-artifact-title">WINWORD.exe (2216) -> rundll32.exe (3384)</strong>
+            <em class="mal-artifact-note">child process created 420ms after the initial document stage, parent exits almost immediately</em>
+          </button>
+          <button class="mal-artifact" type="button" data-mal-probe="rwx-jump">
+            <span class="mal-artifact-badge">mem</span>
+            <strong class="mal-artifact-title">VirtualAlloc + memcpy + jmp rax</strong>
+            <em class="mal-artifact-note">decode loop lands in a fresh RX region after a staged unpack stub finishes</em>
+          </button>
+          <button class="mal-artifact" type="button" data-mal-probe="gate">
+            <span class="mal-artifact-badge">net</span>
+            <strong class="mal-artifact-title">TLS session to /gate on 443</strong>
+            <em class="mal-artifact-note">fixed path, low jitter, small POST body, and no DNS churn in the trace</em>
+          </button>
+        </div>
+
+        <div class="playlab-choice-grid">
+          <section class="playlab-choice-group">
+            <p class="playlab-choice-title">best label for the loader stage</p>
+            <div class="playlab-choice-row">
+              <button class="playlab-action" type="button" data-mal-choice="loader" data-mal-value="staged-loader">staged loader landing in unpacked memory</button>
+              <button class="playlab-action" type="button" data-mal-choice="loader" data-mal-value="office-macro">macro-only execution with no second stage</button>
+              <button class="playlab-action" type="button" data-mal-choice="loader" data-mal-value="dll-sideload">DLL sideload via trusted search path</button>
+            </div>
+          </section>
+
+          <section class="playlab-choice-group">
+            <p class="playlab-choice-title">most likely cross-process launch primitive</p>
+            <div class="playlab-choice-row">
+              <button class="playlab-action" type="button" data-mal-choice="inject" data-mal-value="create-remote-thread">CreateRemoteThread into spawned target</button>
+              <button class="playlab-action" type="button" data-mal-choice="inject" data-mal-value="apc-queue">APC queue on suspended thread</button>
+              <button class="playlab-action" type="button" data-mal-choice="inject" data-mal-value="seh-pivot">SEH pivot from local crash path</button>
+            </div>
+          </section>
+
+          <section class="playlab-choice-group">
+            <p class="playlab-choice-title">which route is the live beacon channel</p>
+            <div class="playlab-choice-row">
+              <button class="playlab-action" type="button" data-mal-choice="beacon" data-mal-value="post-gate">TLS POST /gate with fixed body size</button>
+              <button class="playlab-action" type="button" data-mal-choice="beacon" data-mal-value="dns-txt">DNS TXT polling with jittered labels</button>
+              <button class="playlab-action" type="button" data-mal-choice="beacon" data-mal-value="named-pipe">named pipe broker inside the host</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <aside class="playlab-sidecar">
+        <div class="playlab-sideblock">
+          <p class="playlab-sidehead">analysis</p>
+          <div class="playlab-kv">
+            <span>sample</span>
+            <code>sha256: 7f3a...c91d</code>
+          </div>
+          <div class="playlab-kv">
+            <span>focus</span>
+            <code data-mal-focus>unresolved sample trace</code>
+          </div>
+          <div class="playlab-kv">
+            <span>loader</span>
+            <code data-mal-loader>unknown</code>
+          </div>
+          <div class="playlab-kv">
+            <span>launch</span>
+            <code data-mal-inject>unknown</code>
+          </div>
+          <div class="playlab-kv">
+            <span>c2</span>
+            <code data-mal-beacon>unknown</code>
+          </div>
+        </div>
+
+        <div class="playlab-console">
+          <div class="playlab-console-head">
+            <span>triage notes</span>
+            <code>session.log</code>
+          </div>
+          <div class="playlab-console-feed" data-playlab-feed></div>
+          <div class="playlab-flag" data-playlab-flag-box hidden>
+            <span>flag</span>
+            <code data-playlab-flag></code>
+          </div>
+        </div>
+      </aside>
+    </div>
+  {{- else if eq $kind "reversing" }}
+    <div class="playlab-brief">
+      <div>
+        <p class="playlab-label">control-flow recovery</p>
+        <p class="playlab-objective">Treat the snippet like a real reversing note: isolate the dispatcher, explain the fan-out, and resolve the branch that reaches the winning path.</p>
+      </div>
+      <button class="playlab-reset" type="button" data-playlab-reset>reset trace</button>
+    </div>
+
+    <div class="playlab-grid playlab-grid-reversing">
+      <div class="playlab-main">
+        <div class="playlab-progress">
+          <span class="playlab-stage" data-playlab-stage="inspect">inspect</span>
+          <span class="playlab-stage" data-playlab-stage="rename">symbol</span>
+          <span class="playlab-stage" data-playlab-stage="xref">xrefs</span>
+          <span class="playlab-stage" data-playlab-stage="follow">sink</span>
+        </div>
+
+        <div class="rev-playground">
+          <button class="rev-puzzle-line" type="button" data-rev-probe="cmp">
+            <span class="rev-puzzle-addr">0x4012db</span>
+            <span class="rev-puzzle-op">test rax, rax</span>
+          </button>
+          <button class="rev-puzzle-line" type="button" data-rev-probe="call">
+            <span class="rev-puzzle-addr">0x4012e0</span>
+            <span class="rev-puzzle-op">call rax</span>
+          </button>
+          <button class="rev-puzzle-line" type="button" data-rev-probe="jump">
+            <span class="rev-puzzle-addr">0x40132c</span>
+            <span class="rev-puzzle-op">jmp qword ptr [rax*8+0x404800]</span>
+          </button>
+        </div>
+
+        <div class="playlab-choice-grid">
+          <section class="playlab-choice-group">
+            <p class="playlab-choice-title">best name for `sub_4012d0`</p>
+            <div class="playlab-choice-row">
+              <button class="playlab-action" type="button" data-rev-choice="label" data-rev-value="dispatcher">dispatcher</button>
+              <button class="playlab-action" type="button" data-rev-choice="label" data-rev-value="crc-loop">crc loop</button>
+              <button class="playlab-action" type="button" data-rev-choice="label" data-rev-value="socket-init">socket init</button>
+            </div>
+          </section>
+
+          <section class="playlab-choice-group">
+            <p class="playlab-choice-title">which clue explains the fan-out</p>
+            <div class="playlab-choice-row">
+              <button class="playlab-action" type="button" data-rev-choice="xref" data-rev-value="jump-table">jump table at `0x404800`</button>
+              <button class="playlab-action" type="button" data-rev-choice="xref" data-rev-value="format-string">format string usage</button>
+              <button class="playlab-action" type="button" data-rev-choice="xref" data-rev-value="import-thunk">import thunk chain</button>
+            </div>
+          </section>
+
+          <section class="playlab-choice-group">
+            <p class="playlab-choice-title">which branch reaches the winning sink</p>
+            <div class="playlab-choice-row">
+              <button class="playlab-action" type="button" data-rev-choice="sink" data-rev-value="case-3">case_3 -> win()</button>
+              <button class="playlab-action" type="button" data-rev-choice="sink" data-rev-value="cleanup">cleanup()</button>
+              <button class="playlab-action" type="button" data-rev-choice="sink" data-rev-value="printf">printf()</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <aside class="playlab-sidecar">
+        <div class="playlab-sideblock">
+          <p class="playlab-sidehead">notes</p>
+          <div class="playlab-kv">
+            <span>focus</span>
+            <code data-rev-focus>sub_4012d0</code>
+          </div>
+          <div class="playlab-kv">
+            <span>symbol</span>
+            <code data-rev-label>unknown</code>
+          </div>
+          <div class="playlab-kv">
+            <span>xref</span>
+            <code data-rev-xref>unresolved</code>
+          </div>
+          <div class="playlab-kv">
+            <span>sink</span>
+            <code data-rev-sink>unresolved</code>
+          </div>
+        </div>
+
+        <div class="playlab-console">
+          <div class="playlab-console-head">
+            <span>trace log</span>
+            <code>analysis.txt</code>
+          </div>
+          <div class="playlab-console-feed" data-playlab-feed></div>
+          <div class="playlab-flag" data-playlab-flag-box hidden>
+            <span>flag</span>
+            <code data-playlab-flag></code>
+          </div>
+        </div>
+      </aside>
+    </div>
+  {{- else }}
+    <div class="playlab-brief">
+      <div>
+        <p class="playlab-label">glibc heap drill</p>
+        <p class="playlab-objective">Model a small tcache poisoning sequence: stabilize the layout, free the victim, corrupt the forward pointer, and reclaim the target allocation.</p>
+      </div>
+      <button class="playlab-reset" type="button" data-playlab-reset>reset arena</button>
+    </div>
+
+    <div class="playlab-grid playlab-grid-heap">
+      <div class="playlab-main">
+        <div class="playlab-progress">
+          <span class="playlab-stage" data-playlab-stage="alloc-a">layout</span>
+          <span class="playlab-stage" data-playlab-stage="alloc-b">victim</span>
+          <span class="playlab-stage" data-playlab-stage="free-b">free</span>
+          <span class="playlab-stage" data-playlab-stage="poison">poison</span>
+          <span class="playlab-stage" data-playlab-stage="claim">claim</span>
+        </div>
+
+        <div class="heap-playground">
+          <button class="heap-slot" type="button" data-heap-slot="a">
+            <span class="heap-slot-name">chunk A</span>
+            <em class="heap-slot-addr">0x55555575e2a0</em>
+            <small data-heap-slot-state="a">size=0x91 | available</small>
+          </button>
+          <button class="heap-slot" type="button" data-heap-slot="b">
+            <span class="heap-slot-name">chunk B</span>
+            <em class="heap-slot-addr">0x55555575e330</em>
+            <small data-heap-slot-state="b">size=0x91 | available</small>
+          </button>
+          <button class="heap-slot" type="button" data-heap-slot="c">
+            <span class="heap-slot-name">malloc return</span>
+            <em class="heap-slot-addr">next allocation</em>
+            <small data-heap-slot-state="c">slot idle</small>
+          </button>
+          <button class="heap-slot heap-slot-target" type="button" data-heap-slot="target">
+            <span class="heap-slot-name">__free_hook</span>
+            <em class="heap-slot-addr">0x7ffff7fcf448</em>
+            <small data-heap-slot-state="target">target guarded</small>
+          </button>
+        </div>
+
+        <div class="playlab-actions">
+          <button class="playlab-action" type="button" data-heap-action="alloc-a">malloc(0x88) -> A</button>
+          <button class="playlab-action" type="button" data-heap-action="alloc-b">malloc(0x88) -> B</button>
+          <button class="playlab-action" type="button" data-heap-action="free-b">free(B)</button>
+          <button class="playlab-action" type="button" data-heap-action="poison">overflow(A) -> B->fd</button>
+          <button class="playlab-action" type="button" data-heap-action="alloc-c">malloc(0x88) -> reclaim</button>
+          <button class="playlab-action" type="button" data-heap-action="claim">malloc(0x88) -> target</button>
+        </div>
+      </div>
+
+      <aside class="playlab-sidecar">
+        <div class="playlab-sideblock">
+          <p class="playlab-sidehead">allocator state</p>
+          <div class="playlab-kv">
+            <span>tcache[0x90]</span>
+            <code data-heap-bin>empty</code>
+          </div>
+          <div class="playlab-kv">
+            <span>victim fd</span>
+            <code data-heap-next>NULL</code>
+          </div>
+          <div class="playlab-kv">
+            <span>next malloc</span>
+            <code data-heap-return>0x55555575e2a0</code>
+          </div>
+          <div class="playlab-kv">
+            <span>target</span>
+            <code data-heap-target-view>__free_hook guarded</code>
+          </div>
+        </div>
+
+        <div class="playlab-console">
+          <div class="playlab-console-head">
+            <span>arena trace</span>
+            <code>glibc.log</code>
+          </div>
+          <div class="playlab-console-feed" data-playlab-feed></div>
+          <div class="playlab-flag" data-playlab-flag-box hidden>
+            <span>flag</span>
+            <code data-playlab-flag></code>
+          </div>
+        </div>
+      </aside>
+    </div>
+  {{- end }}
+ </div>

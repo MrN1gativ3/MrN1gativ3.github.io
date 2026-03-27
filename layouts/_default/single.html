@@ -1,6 +1,7 @@
 {{ define "main" }}
   {{ $hero := "" }}
   {{ $heroCard := default "" .Params.animcard }}
+  {{ $heroCardLabel := humanize (replace $heroCard "-" " ") }}
   {{ $heroCardTitle := default "" .Params.animcardtitle }}
   {{ $heroCardNote := default "" .Params.animcardnote }}
   {{ with .Params.image }}
@@ -66,13 +67,24 @@
     </header>
 
     {{ if $heroCard }}
-      <div class="post-cover post-cover-card">
-        {{ partial "animcard.html" (dict
-          "type" $heroCard
-          "title" $heroCardTitle
-          "note" $heroCardNote
-        ) }}
-      </div>
+      <details class="lab-toggle-shell post-lab-shell">
+        <summary class="lab-toggle-summary">
+          <span class="lab-toggle-label">lab://{{ $heroCard }}</span>
+          <span class="lab-toggle-copy">
+            <span class="lab-toggle-closed">open {{ $heroCardLabel | lower }} lab</span>
+            <span class="lab-toggle-open">hide {{ $heroCardLabel | lower }} lab</span>
+          </span>
+        </summary>
+        <div class="lab-toggle-panel">
+          <div class="post-cover post-cover-card">
+            {{ partial "animcard.html" (dict
+              "type" $heroCard
+              "title" $heroCardTitle
+              "note" $heroCardNote
+            ) }}
+          </div>
+        </div>
+      </details>
     {{ else }}
       {{ with $hero }}
         <figure class="post-cover">

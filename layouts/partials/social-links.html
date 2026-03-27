@@ -3,8 +3,9 @@
     {{ range . }}
       {{ $label := .label | default (.name | title) }}
       <li>
-        <a href="{{ .url }}" title="{{ $label }}" {{ if not (hasPrefix .url "mailto:") }}target="_blank" rel="noopener noreferrer"{{ end }}>
-          {{ partial "social-icon.html" (dict "name" .name "label" $label) }}
+        <a href="{{ .url }}" title="{{ $label }}" aria-label="{{ $label }}" {{ if not (hasPrefix .url "mailto:") }}target="_blank" rel="noopener noreferrer"{{ end }}>
+          <span class="social-prefix">$</span>
+          <span class="social-name">{{ lower $label }}</span>
         </a>
       </li>
     {{ end }}
