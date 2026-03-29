@@ -22,6 +22,9 @@
       {{ end }}
     </title>
     <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="icon" type="image/svg+xml" sizes="any" href="{{ "favicon-target.svg" | relURL }}">
+    <link rel="shortcut icon" href="{{ "favicon-target.svg" | relURL }}">
     {{ with resources.Get "css/site.css" }}
       {{ $styles := . | minify | fingerprint }}
       <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}">
@@ -56,6 +59,7 @@
           <li><a href="{{ "/" | relURL }}">Home</a></li>
           <li><a href="{{ "/tags/" | relURL }}">Tags</a></li>
           <li><a href="{{ "/archive/" | relURL }}">Archive</a></li>
+          <li><a href="{{ "/labs/" | relURL }}">Labs</a></li>
         </ul>
       </nav>
     </header>

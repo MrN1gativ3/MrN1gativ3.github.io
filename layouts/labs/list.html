@@ -1,0 +1,31 @@
+{{ define "main" }}
+  <header class="page-header">
+    <h1>{{ .Title }}</h1>
+    {{ with .Content }}
+      <div class="post-content">{{ . }}</div>
+    {{ end }}
+  </header>
+
+  <section class="labs-page">
+    <div class="home-labdeck" data-labdeck>
+      <div class="home-labdeck-bar">
+        <p class="home-labdeck-label">~/playground</p>
+        <div class="home-labdeck-tabs" role="tablist" aria-label="Mini labs">
+          <button class="home-lab-tab is-active" type="button" data-lab-tab="heap" role="tab" aria-selected="true">heap</button>
+          <button class="home-lab-tab" type="button" data-lab-tab="malware" role="tab" aria-selected="false">malware</button>
+          <button class="home-lab-tab" type="button" data-lab-tab="reversing" role="tab" aria-selected="false">reversing</button>
+        </div>
+      </div>
+
+      <div class="home-labpanel is-active" data-lab-panel="heap">
+        {{ partial "challenge-module.html" (dict "kind" "heap" "scope" "home") }}
+      </div>
+      <div class="home-labpanel" data-lab-panel="malware" hidden>
+        {{ partial "challenge-module.html" (dict "kind" "malware" "scope" "home") }}
+      </div>
+      <div class="home-labpanel" data-lab-panel="reversing" hidden>
+        {{ partial "challenge-module.html" (dict "kind" "reversing" "scope" "home") }}
+      </div>
+    </div>
+  </section>
+{{ end }}

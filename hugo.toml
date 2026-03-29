@@ -8,10 +8,10 @@ tag = "tags"
 
 [params]
 author = "MrN1gativ3"
-description = "Linux kernel, heap exploitation, reversing, malware analysis, process injection, and practical technical notes."
+description = "Write-ups on heap exploitation, reversing, malware analysis, Linux internals, process injection, and low-level debugging."
 homeTitle = "MrN1gativ3"
-homeDescription = "A small blog for short posts, technical deep dives, code, screenshots, and things worth keeping."
-homeIntro = "Expect notes on linux kernel internals, heap exploitation, reversing, malware analysis, process injection, and adjacent experiments."
+homeDescription = "Notes, write-ups, and technical breakdowns from exploit development, reversing, malware analysis, and low-level Linux work."
+homeIntro = "Expect heap internals, Linux kernel notes, reversing workflows, malware triage, process injection research, code, screenshots, and small experiments worth documenting."
 footerText = "Built with Hugo. Written in Markdown."
 
 [[params.social]]
